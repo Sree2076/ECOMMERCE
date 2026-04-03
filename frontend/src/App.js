@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 function App() {
   const [products, setProducts] = useState([]);
   const [cart, setCart] = useState([]);
-
+  const BASE_URL = "https://ecommerce-vshg.onrender.com";
   // Fetch products
   useEffect(() => {
     fetch("http://localhost:5000/products")
