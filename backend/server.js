@@ -9,8 +9,8 @@ app.use(express.json());
 
 // Razorpay setup
 const razorpay = new Razorpay({
-  key_id: "rzp_test_xxxxxxxx", // replace with your key
-  key_secret: "xxxxxxxxxx",     // replace with your secret
+  key_id: "rzp_test_SZ04v6Id9Des9v", // replace with your key
+  key_secret: "6vpp5HbEmq0wC5IQgTCWB3OS",     // replace with your secret
 });
 
 // Test route
