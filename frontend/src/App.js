@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 
-const BASE_URL = "https://ecommerce-vshg.onrender.com"; // your backend
+const BASE_URL = "https://zenoxy-api.onrender.com";
 
 function App() {
   const [products, setProducts] = useState([]);
