@@ -1,90 +1,75 @@
 import { useEffect, useState } from "react";
 
+const BASE_URL = "https://ecommerce-vshg.onrender.com"; // your backend
+
 function App() {
   const [products, setProducts] = useState([]);
   const [cart, setCart] = useState([]);
-  const BASE_URL = "https://ecommerce-vshg.onrender.com";
-  // Fetch products
+
   useEffect(() => {
-    fetch("http://localhost:5000/products")
+    fetch(`${BASE_URL}/products`)
       .then(res => res.json())
-      .then(data => setProducts(data));
+      .then(data => setProducts(data))
+      .catch(err => console.error(err));
   }, []);
 
-  // Add to cart
   const addToCart = (product) => {
     const existing = cart.find(item => item.id === product.id);
 
     if (existing) {
-      setCart(
-        cart.map(item =>
-          item.id === product.id
-            ? { ...item, qty: item.qty + 1 }
-            : item
-        )
-      );
+      setCart(cart.map(item =>
+        item.id === product.id
+          ? { ...item, qty: item.qty + 1 }
+          : item
+      ));
     } else {
       setCart([...cart, { ...product, qty: 1 }]);
     }
   };
 
-  // Remove item
-  const removeFromCart = (id) => {
-    setCart(cart.filter(item => item.id !== id));
-  };
-
-  // Increase qty
-  const increaseQty = (id) => {
-    setCart(cart.map(item =>
-      item.id === id ? { ...item, qty: item.qty + 1 } : item
-    ));
-  };
-
-  // Decrease qty
-  const decreaseQty = (id) => {
-    setCart(
-      cart.map(item =>
-        item.id === id ? { ...item, qty: item.qty - 1 } : item
-      ).filter(item => item.qty > 0)
-    );
-  };
-
-  // Total
   const total = cart.reduce(
     (sum, item) => sum + item.price * item.qty,
     0
   );
 
-  // 💳 Payment
   const handlePayment = async () => {
-    const res = await fetch("http://localhost:5000/create-order", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ amount: total }),
-    });
+    try {
+      const res = await fetch(`${BASE_URL}/create-order`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ amount: total }),
+      });
 
-    const data = await res.json();
+      const data = await res.json();
 
-    const options = {
-      key: "rzp_test_SYyAVnudZLkLpN",
-      amount: data.amount,
-      currency: "INR",
-      name: "My Store",
-      description: "Test Payment",
-      order_id: data.id,
-      handler: function (response) {
-        alert("Payment Successful!");
-        console.log(response);
-      },
-      theme: {
-        color: "#3399cc",
-      },
-    };
+      const options = {
+        key: "rzp_test_xxxxxxxx", // same key
+        amount: data.amount,
+        currency: "INR",
+        name: "My Store",
+        description: "Demo Payment",
+        order_id: data.id,
 
-    const rzp = new window.Razorpay(options);
-    rzp.open();
+        handler: function () {
+          alert("✅ Payment Successful (Demo)");
+          setCart([]);
+        },
+
+        modal: {
+          ondismiss: function () {
+            alert("❌ Payment Cancelled");
+          }
+        }
+      };
+
+      const rzp = new window.Razorpay(options);
+      rzp.open();
+
+    } catch (err) {
+      console.error("Payment error:", err);
+    }
   };
 
   return (
@@ -101,29 +86,19 @@ function App() {
       ))}
 
       <h2>Cart</h2>
-
       {cart.length === 0 ? (
         <p>Cart is empty</p>
       ) : (
         cart.map((item) => (
           <div key={item.id}>
             {item.name} - ₹{item.price} x {item.qty}
-
-            <button onClick={() => increaseQty(item.id)}>+</button>
-            <button onClick={() => decreaseQty(item.id)}>-</button>
-
-            <button onClick={() => removeFromCart(item.id)}>
-              Remove
-            </button>
           </div>
         ))
       )}
 
       <h3>Total: ₹{total}</h3>
 
-      <button onClick={handlePayment}>
-        Pay Now
-      </button>
+      <button onClick={handlePayment}>Pay Now</button>
     </div>
   );
 }
