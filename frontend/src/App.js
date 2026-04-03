@@ -45,7 +45,7 @@ function App() {
       const data = await res.json();
 
       const options = {
-        key: "rzp_test_xxxxxxxx", // same key
+        key: "rzp_test_SZ04v6Id9Des9v", // same key
         amount: data.amount,
         currency: "INR",
         name: "My Store",
